@@ -366,7 +366,7 @@ static bool hung_fom_notify(const struct m0_fom *fom)
 
 #ifndef __KERNEL__
 	if (exit_error)
-		exit(1);
+		M0_IMPOSSIBLE("deadlock");
 #endif
 	if (M0_IN(fom->fo_type->ft_id, (M0_BE_TX_GROUP_OPCODE,
 					M0_ADDB_FOP_OPCODE,

@@ -110,7 +110,7 @@ static int fi_command_execute(const struct m0_fi_command_req *req)
 	case M0_FI_DISP_ENABLE:
                if (strcmp(tag, "exit_error") == 0)
                        exit_error = true;
-               else if (strcmp(tag, "exit_error") == 0)
+               else if (strcmp(tag, "exit_error_disable") == 0)
                        exit_error = false;
 		m0_fi_enable(func, tag);
 		break;
