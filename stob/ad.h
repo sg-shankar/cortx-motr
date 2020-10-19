@@ -132,6 +132,8 @@ struct m0_stob_ad_domain {
 	 */
 	struct m0_stob         *sad_bstore;
 	struct m0_be_seg       *sad_be_seg;
+	/** XXX: bs=1m test */
+	m0_bindex_t            next_block;
 	uint64_t                sad_magix;
 } M0_XCA_RECORD M0_XCA_DOMAIN(be);
 M0_BASSERT(sizeof(M0_FIELD_VALUE(struct m0_stob_ad_domain, sad_path)) % 8 == 0);
