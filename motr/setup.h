@@ -340,6 +340,9 @@ struct m0_reqh_context {
 	/** Enable Fault Injection Service */
 	bool                         rc_fis_enabled;
 
+	/** Disable tx grouping */
+	bool                         rc_disable_tx_grouping;
+
 	/** ADDB Record Max record size in bytes */
 	m0_bcount_t                  rc_addb_record_file_size;
 };

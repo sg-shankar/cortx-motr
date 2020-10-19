@@ -106,8 +106,6 @@ void m0_be_ut_btree_create_truncate(void)
 	M0_LEAVE();
 }
 
-//extern volatile bool M0_BE_TX_LOGIC_CHANGE_PHASE0;
-
 void m0_be_ut_btree_create_destroy(void)
 {
 	struct m0_be_btree *tree0;
@@ -124,8 +122,6 @@ void m0_be_ut_btree_create_destroy(void)
 	seg = ut_seg->bus_seg;
 
 	M0_LOG(M0_INFO, "HELLO MAX WAS HERE!");
-
-	//M0_BE_TX_LOGIC_CHANGE_PHASE0 = true;
 
 	/* create btrees */
 	tree0 = create_tree();

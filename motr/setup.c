@@ -74,6 +74,7 @@
 
 extern struct m0_reqh_service_type m0_ss_svc_type;
 
+volatile bool M0_BE_TX_LOGIC_CHANGE_PHASE0;
 /**
  * The space for M0_BAP_REPAIR zone in BE allocator is calculated based on
  * distributed index replication factor and total number of target disks. But
@@ -1039,7 +1040,8 @@ static int cs_storage_init(const char *stob_type,
 			   struct cs_stobs *stob,
 			   struct m0_be_seg *seg,
 			   bool mkfs, bool force,
-			   bool disable_direct_io)
+			   bool disable_direct_io,
+			   bool disable_tx_grouping)
 {
 	const char *ldom_cfg_init;
 	bool        linux_stob;
@@ -1061,7 +1063,7 @@ static int cs_storage_init(const char *stob_type,
 	m0_get()->i_storage_is_fake   = fake_storage =
 		linux_stob && stob_path != NULL && !stob->s_ad_disks_init &&
 		!stob->s_sfile.sf_is_initialised;
-
+	M0_BE_TX_LOGIC_CHANGE_PHASE0 = disable_tx_grouping;
 
 	if (mkfs && force && (fake_storage || !linux_stob))
 		rc = cs_storage_ldom_destroy(stob_path, NULL);
@@ -1606,7 +1608,8 @@ static int cs_storage_setup(struct m0_motr *cctx)
 	rc = cs_storage_init(rctx->rc_stype, rctx->rc_stpath,
 			     M0_AD_STOB_LINUX_DOM_KEY,
 			     &rctx->rc_stob, rctx->rc_beseg,
-			     mkfs, force, rctx->rc_disable_direct_io);
+			     mkfs, force, rctx->rc_disable_direct_io,
+			     rctx->rc_disable_tx_grouping);
 	if (rc != 0) {
 		M0_LOG(M0_ERROR, "cs_storage_init: rc=%d", rc);
 		/* XXX who should call yaml_document_delete()? */
@@ -1845,6 +1848,7 @@ static void cs_help(FILE *out, const char *progname)
 "  -J num   Number of net buffers used by SNS.\n"
 "  -o str   Enable fault injection point with given name.\n"
 "  -g       Disable ADDB storage.\n"
+"  -t       Disable tx grouping -t 1.\n"
 "\n"
 "Request handler options:\n"
 "  -D str   BE stob domain file path (used by UT only).\n"
@@ -2301,6 +2305,14 @@ static int _args_parse(struct m0_motr *cctx, int argc, char **argv)
 						M0_LOG(M0_WARN, "ADDB size is more than recommended");
 					M0_LOG(M0_DEBUG, "ADDB size = %"PRIu64"", size);
 					rctx->rc_addb_record_file_size = size;
+				})),
+			M0_NUMBERARG('t', "disable tx grouping",
+				LAMBDA(void, (int64_t val)
+				{
+					if (val > 0)
+						rctx->rc_disable_tx_grouping = true;
+					else
+						rctx->rc_disable_tx_grouping = false;
 				})),
 			);
 	/* generate reqh fid in case it is all-zero */
@@ -3029,8 +3041,6 @@ M0_INTERNAL int m0_motr_stob_reopen(struct m0_reqh *reqh,
 	}
 	return M0_RC(rc);
 }
-
-volatile bool M0_BE_TX_LOGIC_CHANGE_PHASE0;
 
 /** @} endgroup m0d */
 #undef M0_TRACE_SUBSYSTEM
