@@ -2358,12 +2358,14 @@ repeat:
 			grp = m0_balloc_gn2info(bac->bac_ctxt, group);
 			// m0_balloc_debug_dump_group("searching group ...",
 			//			 grp);
-
+		again:
+			if (!balloc_is_good_group(bac, grp))
+				continue;
 			rc = m0_balloc_trylock_group(grp);
 			if (rc != 0) {
 				M0_LOG(M0_DEBUG, "grp=%d is busy", (int)group);
 				/* This group is under processing by others. */
-				continue;
+				goto again;
 			}
 
 			/* quick check to skip empty groups */
