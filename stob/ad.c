@@ -51,6 +51,9 @@
 #include "stob/stob_internal.h"	/* m0_stob__fid_set */
 #include "stob/type.h"		/* m0_stob_type */
 #include "be/domain.h"
+#include "lib/types.h"
+#include "lib/assert.h"
+
 
 /**
  * @addtogroup stobad
@@ -402,6 +405,9 @@ static int stob_ad_domain_init(struct m0_stob_type *type,
 	dom->sd_private = adom;
 	dom->sd_ops     = &stob_ad_domain_ops;
 	m0_be_emap_init(&adom->sad_adata, seg);
+
+	/* XXX: bs=1m test */
+	adom->next_block = 0;
 
 	ballroom = adom->sad_ballroom;
 	m0_balloc_init(b2m0(ballroom));
@@ -1022,6 +1028,17 @@ static int stob_ad_balloc(struct m0_stob_ad_domain *adom, struct m0_dtx *tx,
 	struct m0_ad_balloc *ballroom = adom->sad_ballroom;
 	int                  rc;
 
+	 /* XXX: for 1MB BS test */
+	if (1) {
+		/* static struct m0_atomic64 next_block = { .a_value = 0 }; */
+		rc = 0;
+		M0_SET0(out);
+		//out->e_start = m0_atomic64_add_return(&next_block, 0x100);
+		out->e_start = __sync_add_and_fetch(&adom->next_block, 0x100);
+		out->e_end   = out->e_start + 0x100;
+		return M0_RC(rc);
+	}
+	/* XXX: for 1MB BS test */
 	count >>= adom->sad_babshift;
 	M0_LOG(M0_DEBUG, "count=%lu", (unsigned long)count);
 	M0_ASSERT(count > 0);
