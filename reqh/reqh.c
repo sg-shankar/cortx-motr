@@ -666,6 +666,7 @@ static void __reqh_svcs_stop(struct m0_reqh *reqh, unsigned level)
 		}
 		M0_LOG(M0_DEBUG, "service=%s level=%d srvlev=%d",
 		       service->rs_type->rst_name, level, service->rs_level);
+		m0_reqh_idle_wait_for(reqh, service);
 		m0_reqh_service_fini(service);
 		if (service == reqh->rh_rpc_service)
 			reqh->rh_rpc_service = NULL;

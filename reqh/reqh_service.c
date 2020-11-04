@@ -459,7 +459,6 @@ M0_INTERNAL void m0_reqh_service_fini(struct m0_reqh_service *service)
 	M0_PRE(service != NULL && m0_reqh_service_bob_check(service));
 
 	M0_ASSERT(m0_fom_domain_is_idle_for(service));
-	m0_locality_lockers_free(service->rs_fom_key);
 	m0_reqh_svc_tlink_del_fini(service);
 	m0_reqh_service_bob_fini(service);
 	m0_sm_group_lock(&service->rs_reqh->rh_sm_grp);
@@ -467,6 +466,7 @@ M0_INTERNAL void m0_reqh_service_fini(struct m0_reqh_service *service)
 	m0_sm_group_unlock(&service->rs_reqh->rh_sm_grp);
 	m0_mutex_fini(&service->rs_mutex);
 	m0_buf_free(&service->rs_ss_param);
+	m0_locality_lockers_free(service->rs_fom_key);
 	service->rs_ops->rso_fini(service);
 }
 
