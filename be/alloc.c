@@ -1122,7 +1122,7 @@ M0_INTERNAL void m0_be_free_aligned(struct m0_be_allocator *a,
 	M0_PRE(be_alloc_chunk_invariant(a, c));
 	M0_PRE(!c->bac_free);
 	ztype = c->bac_zone;
-	M0_LOG(M0_DEBUG, "allocator=%p c=%p c->bac_size=%lu zone=%d "
+	M0_LOG(M0_DEBUG, "allocator=%p c=%p c->bac_size=%"PRId64" zone=%d "
 			"data=%p", a, c, c->bac_size, c->bac_zone, &c->bac_mem);
 	/* algorithm starts here */
 	be_alloc_chunk_mark_free(a, ztype, tx, c);
